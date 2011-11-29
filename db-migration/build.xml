@@ -3,7 +3,10 @@
 <project name="database" default="main">
 
     <target name="main">
-        
+
+        <taskdef classname="Tasks_SqlFind" name="sqlfind" />
+
+        <sqlfind directories="sites/*/migration/*.sql" username="root" password="password" hostname="hostname" />
 
     </target>
 
