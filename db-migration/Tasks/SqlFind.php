@@ -1,5 +1,5 @@
 <?php
-
+date_default_timezone_set('Europe/London');
 class Tasks_SqlFind extends Task {
 
 	protected $directories;
@@ -31,30 +31,29 @@ class Tasks_SqlFind extends Task {
 		}
 
 		$conn = mysqli_connect($this->hostname, $this->username, $this->password);
-
-
-
+		
+		
 		$files = glob($this->directories);
 
 		foreach ($files as $file) {
-
 			$sqlContent = file_get_contents($file);
 
 			preg_match("~`([-_a-z0-9]+)`.`([-_a-z0-9]+)`~isU", $sqlContent, $sqlDetails);
-
-			if (isset($sqlDetails[0])) {
+			
+			if (!isset($sqlDetails[0])) {
 				throw new BuildException('"'.$file.'" is not correctly formated SQL');
 			}
 
 			$sqlDatabase = $sqlDetails[1];
 			$sqlTable = $sqlDetails[2];
 
-			mysqli_select_db($conn, $sqlDatabase);
-			$resultRsc = mysqli_query("SELECT UPDATE_TIME FROM tables WHERE TABLE_SCHEMA = '".$sqlDatabase."' AND TABLE_NAME = '".$sqlTable."'");
+			$conn->select_db($sqlDatabase);
+			$resultRsc = $conn->query("SELECT UPDATE_TIME FROM `information_schema`.`tables` WHERE TABLE_SCHEMA = '".$sqlDatabase."' AND TABLE_NAME = '".$sqlTable."'");
+			
 			$result = mysqli_fetch_assoc($resultRsc);
 
 			if (strtotime($result['UPDATE_TIME']) < filemtime($file)) {
-				mysqli_query($sqlContent);
+				$result = $conn->query($sqlContent);
 			}
 
 		}

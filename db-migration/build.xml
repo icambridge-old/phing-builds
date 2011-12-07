@@ -2,11 +2,13 @@
 
 <project name="database" default="main">
 
+    <property file="./build.properties" />
+
     <target name="main">
 
         <taskdef classname="Tasks_SqlFind" name="sqlfind" />
 
-        <sqlfind directories="sites/*/migration/*.sql" username="root" password="password" hostname="hostname" />
+        <sqlfind directories="${build.dir}/sites/*/migration/*.sql" username="root" password="" hostname="127.0.0.1" />
 
     </target>
 
